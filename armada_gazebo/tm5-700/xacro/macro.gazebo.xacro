@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="tmr_gazebo" params="ns prefix">
+
+    <gazebo>
+      <plugin name='gz_ros2_control::GazeboSimROS2ControlPlugin' filename='libgz_ros2_control-system.so'>
+        <parameters>$(find tm5-700_moveit_config)/config/ros2_controllers.yaml</parameters>
+      </plugin>
+
+      <plugin
+        filename="gz-sim-joint-state-publisher-system"
+        name="gz::sim::systems::JointStatePublisher">
+      </plugin>
+    </gazebo>
+
+  </xacro:macro>
+
+</robot>
