@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<sdf version="1.8">
+  <world name="panda">
+    <plugin
+      filename="gz-sim-detachable-joint-system"
+      name="gz::sim::systems::DetachableJoint">
+      <parent_model>panda</parent_model>
+      <parent_link>panda_link7</parent_link>
+      <child_model>rgbd_camera</child_model>
+      <child_link>camera_link</child_link>
+    </plugin>
+  </world>
+</sdf>
