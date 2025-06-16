@@ -4,7 +4,7 @@ import xacro
 import yaml
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, OpaqueFunction
+from launch.actions import DeclareLaunchArgument, OpaqueFunction, TimerAction, ExecuteProcess
 from launch.substitutions import LaunchConfiguration
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node, SetParameter, LoadComposableNodes, ComposableNodeContainer
@@ -48,7 +48,6 @@ def launch_setup(context, *args, **kwargs):
     ros_gz_sim_path = get_package_share_directory('ros_gz_sim')
 
     # Robot Description
-    # xacro_path = os.path.join(robot_description_pkg, 'xacro', f'{robot_name}.urdf.xacro')
     xacro_path = os.path.join(robot_description_pkg, f'{robot_model}', 'xacro', f'{robot_model}' + (f'_{workstation}' if workstation else '') + '.urdf.xacro')
     robot_description_config = xacro.process_file(xacro_path)
     robot_description = {'robot_description': robot_description_config.toxml()}
@@ -116,6 +115,17 @@ def launch_setup(context, *args, **kwargs):
         ],
     )
 
+    pause_sim = ExecuteProcess(
+        cmd=[
+            'gz', 'service', '-s', f'/world/{robot_model}/control',
+            '--reqtype', 'gz.sim.v8.WorldControl',
+            '--reptype', 'gz.sim.v8.Boolean',
+            '--timeout', '300',
+            '--req', '{"pause": true}'
+        ],
+        output='screen'
+    )
+
     # Spawn the robot model into the gazebo world
     spawn_entity = Node(
         package="ros_gz_sim",
@@ -128,6 +138,32 @@ def launch_setup(context, *args, **kwargs):
             "-z", "0.5",
         ],
         output="screen",
+    )
+
+    spawn_camera = Node(
+        package='ros_gz_sim',
+        executable='create',
+        arguments=[
+            '-file', '/home/csrobot/arm_driver_ws/src/armada_ros2/armada_gazebo/rgbd_camera/model/rgbd_camera_model.sdf',
+            '-name', 'rgbd_camera',
+            '-x', '0.5', '-y', '0', '-z', '1.2'  # Adjust pose if needed
+        ],
+        output='screen'
+    )
+
+    sim_camera_tf = Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        arguments=["0.5", "0", "0.7", "0", "0", "0", "simple_pedestal", "rgbd_camera/camera_link/rgbd_camera"],
+    )
+
+    spawn_joint_plugin = Node(
+        package='ros_gz_sim',
+        executable='create',
+        arguments=[
+            '-file', '/home/csrobot/arm_driver_ws/src/armada_ros2/armada_gazebo/rgbd_camera/detachable_joint/detachable_joint.sdf'
+        ],
+        output='screen'
     )
 
     bridge = Node(
@@ -197,57 +233,61 @@ def launch_setup(context, *args, **kwargs):
         output="screen",
     )
 
-    move_named = Node(
-        package="robot_common_manip",
-        executable="move_to_named_pose_service",
-        name="move_to_named_pose_service",
-        output="screen",
-        parameters=[
-            {"planning_group": planning_group},
-            robot_description,
-            robot_description_semantic,
-        ],
-    )
+    # move_named = Node(
+    #     package="robot_common_manip",
+    #     executable="move_to_named_pose_service",
+    #     name="move_to_named_pose_service",
+    #     output="screen",
+    #     parameters=[
+    #         {"planning_group": planning_group},
+    #         robot_description,
+    #         robot_description_semantic,
+    #     ],
+    # )
 
-    move_pose = Node(
-        package="robot_common_manip",
-        executable="move_to_pose_service",
-        name="move_to_pose_service",
-        output="screen",
-        parameters=[
-            {"planning_group": planning_group},
-            robot_description,
-            robot_description_semantic,
-        ],
-    )
+    # move_pose = Node(
+    #     package="robot_common_manip",
+    #     executable="move_to_pose_service",
+    #     name="move_to_pose_service",
+    #     output="screen",
+    #     parameters=[
+    #         {"planning_group": planning_group},
+    #         robot_description,
+    #         robot_description_semantic,
+    #     ],
+    # )
 
-    fake_grasp = Node(
-        package="robot_common_manip",
-        executable="fake_grasp_service",
-        name="fake_grasp_service",
-        output="screen",
-        parameters=[
-            {"planning_group": planning_group},
-            robot_description,
-            robot_description_semantic,
-        ],
-    )
+    # fake_grasp = Node(
+    #     package="robot_common_manip",
+    #     executable="fake_grasp_service",
+    #     name="fake_grasp_service",
+    #     output="screen",
+    #     parameters=[
+    #         {"planning_group": planning_group},
+    #         robot_description,
+    #         robot_description_semantic,
+    #     ],
+    # )
 
     # start up all of the nodes
     return [
         gz_sim,
+        pause_sim,
         # gazebo_nodes,
         # manipulation_nodes,
         spawn_entity,
+        spawn_camera,
+        sim_camera_tf,
+        # spawn_joint_plugin,
         bridge,
         rviz_node,
         robot_state_publisher,
         run_move_group_node,
         load_arm_controller,
         load_hand_controller,
-        move_named,
-        move_pose,
-        fake_grasp,
+        # move_named,
+        # move_pose,
+        # fake_grasp,
     ]
 
 def generate_launch_description():
