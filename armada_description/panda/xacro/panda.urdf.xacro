@@ -8,7 +8,7 @@
 
   <!-- include gazebo files -->
   <xacro:include filename="$(find armada_gazebo)/xacro/macro.gazebo.xacro" />
-  <xacro:include filename="$(find armada_gazebo)/xacro/macro.gazebo_sensor.xacro" />
+  <!-- <xacro:include filename="$(find armada_gazebo)/xacro/macro.gazebo_sensor.xacro" /> -->
 
   <!-- include control files -->
   <xacro:include filename="$(find armada_description)/xacro/macro.ros2_control.xacro" />
@@ -19,7 +19,7 @@
 
   <!-- panda gazebo components -->
   <xacro:panda_gazebo ns="$(arg ns)" prefix="$(arg prefix)" />
-  <xacro:panda_gazebo_sensor ns="$(arg ns)" prefix="$(arg prefix)" />
+  <!-- <xacro:panda_gazebo_sensor ns="$(arg ns)" prefix="$(arg prefix)" /> -->
 
   <!-- panda control components-->
   <xacro:panda_transmission prefix="$(arg prefix)" hw_iface="$(arg trans_hw_iface)" />
