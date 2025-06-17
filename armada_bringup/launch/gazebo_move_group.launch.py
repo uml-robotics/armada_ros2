@@ -135,7 +135,7 @@ def launch_setup(context, *args, **kwargs):
             "-topic", "/robot_description",
             "-x", "0.0",
             "-y", "0.0",
-            "-z", "0.5",
+            "-z", "0.25",
         ],
         output="screen",
     )
@@ -146,7 +146,7 @@ def launch_setup(context, *args, **kwargs):
         arguments=[
             '-file', '/home/csrobot/arm_driver_ws/src/armada_ros2/armada_gazebo/rgbd_camera/model/rgbd_camera_model.sdf',
             '-name', 'rgbd_camera',
-            '-x', '0.5', '-y', '0', '-z', '1.2'  # Adjust pose if needed
+            '-x', '0.5', '-y', '0.0', '-z', '2.0', '-R', '0.0', '-P', '1.5708', '-Y', '0.0',  # Adjust pose if needed
         ],
         output='screen'
     )
@@ -154,16 +154,7 @@ def launch_setup(context, *args, **kwargs):
     sim_camera_tf = Node(
         package="tf2_ros",
         executable="static_transform_publisher",
-        arguments=["0.5", "0", "0.7", "0", "0", "0", "simple_pedestal", "rgbd_camera/camera_link/rgbd_camera"],
-    )
-
-    spawn_joint_plugin = Node(
-        package='ros_gz_sim',
-        executable='create',
-        arguments=[
-            '-file', '/home/csrobot/arm_driver_ws/src/armada_ros2/armada_gazebo/rgbd_camera/detachable_joint/detachable_joint.sdf'
-        ],
-        output='screen'
+        arguments=["0.5", "0", "1.75", "0", "1.5708", "0", "simple_pedestal", "rgbd_camera/camera_link/rgbd_camera"],
     )
 
     bridge = Node(
@@ -278,7 +269,6 @@ def launch_setup(context, *args, **kwargs):
         spawn_entity,
         spawn_camera,
         sim_camera_tf,
-        # spawn_joint_plugin,
         bridge,
         rviz_node,
         robot_state_publisher,
