@@ -13,6 +13,7 @@ find_package(ament_cmake REQUIRED)
 
 install(DIRECTORY panda/ DESTINATION share/${PROJECT_NAME}/panda)
 install(DIRECTORY tm5-700/ DESTINATION share/${PROJECT_NAME}/tm5-700)
+install(DIRECTORY rgbd_camera/ DESTINATION share/${PROJECT_NAME}/rgbd_camera)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
