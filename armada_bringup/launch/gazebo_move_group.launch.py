@@ -144,7 +144,7 @@ def launch_setup(context, *args, **kwargs):
         package='ros_gz_sim',
         executable='create',
         arguments=[
-            '-file', '/home/csrobot/arm_driver_ws/src/armada_ros2/armada_gazebo/rgbd_camera/model/rgbd_camera_model.sdf',
+            '-file', f'{gazebo_package_path}/rgbd_camera/model/rgbd_camera_model.sdf',
             '-name', 'rgbd_camera',
             '-x', '0.5', '-y', '0.0', '-z', '2.0', '-R', '0.0', '-P', '1.5708', '-Y', '0.0',  # Adjust pose if needed
         ],
