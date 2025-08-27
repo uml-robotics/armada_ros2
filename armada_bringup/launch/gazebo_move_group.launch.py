@@ -260,6 +260,51 @@ def launch_setup(context, *args, **kwargs):
     #     ],
     # )
 
+    get_pointcloud = Node(
+        package="compare_flexbe_utilities",
+        executable="get_point_cloud_service",
+        name="get_point_cloud_service",
+        output="screen",
+        parameters=[
+            {"default_camera_topic": "/camera/depth/points"},
+            {"target_frame": "base_link"},
+            {"timeout_sec": 3.0},
+        ],
+    )
+
+    spawn_object_1 = Node(
+        package='ros_gz_sim',
+        executable='create',
+        arguments=[
+            '-file', '/home/csrobot/gazebo_models/beer/model.sdf',
+            '-name', 'object_1',
+            '-x', '0.55', '-y', '0.05', '-z', '0.65', '-R', '0.0', '-P', '0.0', '-Y', '0.0',  # Adjust pose if needed
+        ],
+        output='screen'
+    )
+
+    spawn_object_2 = Node(
+        package='ros_gz_sim',
+        executable='create',
+        arguments=[
+            '-file', '/home/csrobot/gazebo_models/wood_cube_10cm/model.sdf',
+            '-name', 'object_2',
+            '-x', '0.45', '-y', '0.15', '-z', '0.65', '-R', '0.0', '-P', '0.0', '-Y', '0.0',  # Adjust pose if needed
+        ],
+        output='screen'
+    )
+
+    spawn_object_3 = Node(
+        package='ros_gz_sim',
+        executable='create',
+        arguments=[
+            '-file', '/home/csrobot/gazebo_models/wood_block_10_2_1cm/model.sdf',
+            '-name', 'object_3',
+            '-x', '0.5', '-y', '0.10', '-z', '0.65', '-R', '0.0', '-P', '0.0', '-Y', '0.0',  # Adjust pose if needed
+        ],
+        output='screen'
+    )
+
     # start up all of the nodes
     return [
         gz_sim,
@@ -278,6 +323,10 @@ def launch_setup(context, *args, **kwargs):
         # move_named,
         # move_pose,
         # fake_grasp,
+        get_pointcloud,
+        spawn_object_1,
+        spawn_object_2,
+        spawn_object_3,
     ]
 
 def generate_launch_description():
