@@ -5,7 +5,8 @@ import yaml
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, OpaqueFunction, TimerAction, ExecuteProcess
-from launch.substitutions import LaunchConfiguration
+from launch.conditions import IfCondition, UnlessCondition
+from launch.substitutions import PythonExpression, LaunchConfiguration
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node, SetParameter, LoadComposableNodes, ComposableNodeContainer
 from ament_index_python.packages import get_package_share_directory
@@ -46,6 +47,8 @@ def launch_setup(context, *args, **kwargs):
     moveit_config_path = get_package_share_directory(moveit_config_package)
     gazebo_package_path = get_package_share_directory(gazebo_package)
     ros_gz_sim_path = get_package_share_directory('ros_gz_sim')
+    flexbe_onboard_path = get_package_share_directory('flexbe_onboard')
+    flexbe_webui_path = get_package_share_directory('flexbe_webui')
 
     # Robot Description
     xacro_path = os.path.join(robot_description_pkg, f'{robot_model}', 'xacro', f'{robot_model}' + (f'_{workstation}' if workstation else '') + '.urdf.xacro')
@@ -115,15 +118,14 @@ def launch_setup(context, *args, **kwargs):
         ],
     )
 
-    pause_sim = ExecuteProcess(
-        cmd=[
-            'gz', 'service', '-s', f'/world/{robot_model}/control',
-            '--reqtype', 'gz.sim.v8.WorldControl',
-            '--reptype', 'gz.sim.v8.Boolean',
-            '--timeout', '300',
-            '--req', '{"pause": true}'
-        ],
-        output='screen'
+    # Launch FlexBE operator control system (OCS)
+    flexbe_full = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(flexbe_webui_path, 'launch', 'flexbe_full.launch.py')),
+        launch_arguments={
+            'headless': LaunchConfiguration('headless')
+        }.items(),
+        condition=IfCondition(LaunchConfiguration('launch_flexbe')),
     )
 
     # Spawn the robot model into the gazebo world
@@ -248,22 +250,34 @@ def launch_setup(context, *args, **kwargs):
     #     ],
     # )
 
-    # fake_grasp = Node(
-    #     package="robot_common_manip",
-    #     executable="fake_grasp_service",
-    #     name="fake_grasp_service",
-    #     output="screen",
-    #     parameters=[
-    #         {"planning_group": planning_group},
-    #         robot_description,
-    #         robot_description_semantic,
-    #     ],
-    # )
-
-    get_pointcloud = Node(
+    get_pointcloud_service = Node(
         package="compare_flexbe_utilities",
         executable="get_point_cloud_service",
         name="get_point_cloud_service",
+        output="screen",
+        parameters=[
+            {"default_camera_topic": "/camera/depth/points"},
+            {"target_frame": "base_link"},
+            {"timeout_sec": 3.0},
+        ],
+    )
+
+    euclidean_clustering_service = Node(
+        package="compare_flexbe_utilities",
+        executable="euclidean_clustering_service",
+        name="euclidean_clustering_service",
+        output="screen",
+        parameters=[
+            {"default_camera_topic": "/camera/depth/points"},
+            {"target_frame": "base_link"},
+            {"timeout_sec": 3.0},
+        ],
+    )
+
+    filter_by_indices_service = Node(
+        package="compare_flexbe_utilities",
+        executable="filter_by_indices_service",
+        name="filter_by_indices_service",
         output="screen",
         parameters=[
             {"default_camera_topic": "/camera/depth/points"},
@@ -276,7 +290,7 @@ def launch_setup(context, *args, **kwargs):
         package='ros_gz_sim',
         executable='create',
         arguments=[
-            '-file', '/home/csrobot/gazebo_models/beer/model.sdf',
+            '-file', '/home/csrobot/gazebo_models/wood_cube_10cm/model.sdf',
             '-name', 'object_1',
             '-x', '0.55', '-y', '0.05', '-z', '0.65', '-R', '0.0', '-P', '0.0', '-Y', '0.0',  # Adjust pose if needed
         ],
@@ -298,7 +312,7 @@ def launch_setup(context, *args, **kwargs):
         package='ros_gz_sim',
         executable='create',
         arguments=[
-            '-file', '/home/csrobot/gazebo_models/wood_block_10_2_1cm/model.sdf',
+            '-file', '/home/csrobot/gazebo_models/wood_cube_10cm/model.sdf',
             '-name', 'object_3',
             '-x', '0.5', '-y', '0.10', '-z', '0.65', '-R', '0.0', '-P', '0.0', '-Y', '0.0',  # Adjust pose if needed
         ],
@@ -308,9 +322,7 @@ def launch_setup(context, *args, **kwargs):
     # start up all of the nodes
     return [
         gz_sim,
-        pause_sim,
-        # gazebo_nodes,
-        # manipulation_nodes,
+        flexbe_full,
         spawn_entity,
         spawn_camera,
         sim_camera_tf,
@@ -322,8 +334,9 @@ def launch_setup(context, *args, **kwargs):
         load_hand_controller,
         # move_named,
         # move_pose,
-        # fake_grasp,
-        get_pointcloud,
+        get_pointcloud_service,
+        euclidean_clustering_service,
+        filter_by_indices_service,
         spawn_object_1,
         spawn_object_2,
         spawn_object_3,
@@ -350,6 +363,16 @@ def generate_launch_description():
             'workstation',
             default_value='simple_pedestal',
             description='Name of the pedestal or workstation the robot base is attached to (used to locate packages and files).'
+        ),
+        DeclareLaunchArgument(
+            'headless', 
+            default_value="False",
+            description="Run FlexBE OCS without the web UI frontend."
+        ),
+        DeclareLaunchArgument(
+            'launch_flexbe',
+            default_value='False',
+            description='If true, start FlexBE (onboard + OCS).'
         ),
         OpaqueFunction(function=launch_setup),
     ])
