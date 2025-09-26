@@ -148,7 +148,7 @@ def launch_setup(context, *args, **kwargs):
         arguments=[
             '-file', f'{gazebo_package_path}/rgbd_camera/model/rgbd_camera_model.sdf',
             '-name', 'rgbd_camera',
-            '-x', '0.5', '-y', '0.0', '-z', '2.0', '-R', '0.0', '-P', '1.5708', '-Y', '0.0',  # Adjust pose if needed
+            '-x', '0.5', '-y', '0.0', '-z', '2.0', '-R', '0.0', '-P', '1.5708', '-Y', '0.0',  # Adjust pose if needed, camera has no collision
         ],
         output='screen'
     )
@@ -156,7 +156,7 @@ def launch_setup(context, *args, **kwargs):
     sim_camera_tf = Node(
         package="tf2_ros",
         executable="static_transform_publisher",
-        arguments=["0.5", "0", "1.75", "0", "1.5708", "0", "simple_pedestal", "rgbd_camera/camera_link/rgbd_camera"],
+        arguments=["0.5", "0", "1.75", "0", "1.5708", "0", "simple_pedestal", "rgbd_camera/camera_link/rgbd_camera"],   # transform from base of robot is camera height - height of base over ground (1.5 - 0.25)
     )
 
     bridge = Node(
@@ -319,6 +319,20 @@ def launch_setup(context, *args, **kwargs):
         output='screen'
     )
 
+    detect_grasps = Node(
+        package="gpd_ros",
+        executable="grasp_detection_server",
+        name="grasp_detection_server",
+        output="screen",
+        parameters=[
+            {"camera_position": [0.0, 0.0, 0.0]},
+            {"config_file": '/home/csrobot/gpd_ws/gpd/cfg/ros_eigen_params.cfg'},
+            {"grasps_topic": 'clustered_grasps'},
+            # {"rviz_topic": "grasp_plotter"},
+            {"service_name": 'detect_grasps'},
+        ],
+    )
+
     # start up all of the nodes
     return [
         gz_sim,
@@ -340,6 +354,7 @@ def launch_setup(context, *args, **kwargs):
         spawn_object_1,
         spawn_object_2,
         spawn_object_3,
+        detect_grasps,
     ]
 
 def generate_launch_description():
