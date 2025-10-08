@@ -50,6 +50,8 @@ def launch_setup(context, *args, **kwargs):
     flexbe_onboard_path = get_package_share_directory('flexbe_onboard')
     flexbe_webui_path = get_package_share_directory('flexbe_webui')
 
+    gazebo_models_path = os.path.join(gazebo_package_path, 'models') 
+
     # Robot Description
     xacro_path = os.path.join(robot_description_pkg, f'{robot_model}', 'xacro', f'{robot_model}' + (f'_{workstation}' if workstation else '') + '.urdf.xacro')
     robot_description_config = xacro.process_file(xacro_path)
@@ -226,6 +228,30 @@ def launch_setup(context, *args, **kwargs):
         output="screen",
     )
 
+    move_cartesian = Node(
+        package="compare_flexbe_utilities",
+        executable="cartesian_move_to_pose_service",
+        name="cartesian_move_to_pose_service",
+        output="screen",
+        parameters=[
+            {"planning_group": planning_group},
+            robot_description,
+            robot_description_semantic,
+        ],
+    )
+
+    move_pose = Node(
+        package="compare_flexbe_utilities",
+        executable="move_to_pose_service",
+        name="move_to_pose_service",
+        output="screen",
+        parameters=[
+            {"planning_group": planning_group},
+            robot_description,
+            robot_description_semantic,
+        ],
+    )
+
     # move_named = Node(
     #     package="robot_common_manip",
     #     executable="move_to_named_pose_service",
@@ -238,17 +264,36 @@ def launch_setup(context, *args, **kwargs):
     #     ],
     # )
 
-    # move_pose = Node(
-    #     package="robot_common_manip",
-    #     executable="move_to_pose_service",
-    #     name="move_to_pose_service",
-    #     output="screen",
-    #     parameters=[
-    #         {"planning_group": planning_group},
-    #         robot_description,
-    #         robot_description_semantic,
-    #     ],
-    # )
+    detect_grasps = Node(
+        package="gpd_ros",
+        executable="grasp_detection_server",
+        name="grasp_detection_server",
+        output="screen",
+        parameters=[
+            {"camera_position": [0.0, 0.0, 0.0]},
+            {"config_file": '/home/brian/flexbe_ws/gpd/cfg/ros_eigen_params.cfg'},
+            {"rviz_topic": "grasp_markers"},  # /rviz_grasps
+            {"grasps_topic": "/clustered_grasps"},
+        ],
+    )
+
+    compute_grasp_poses = Node(
+        package="gpd_ros",
+        executable="grasp_pose_server",
+        name="grasp_pose_server",
+        output="screen",
+        parameters=[
+            {"gripper_offset": -0.02},
+            {"approach_dist": 0.0},
+            {"retreat_dist": 0.0},
+            {"grasp_rot_x": 0.0},
+            {"grasp_rot_y": 0.39269908169},
+            {"grasp_rot_z": -0.981747704},
+            {"grasp_rot_w": 1.0},
+            {"target_frame": "panda_link0"},
+            {"source_frame": "rgbd_camera/camera_link/rgbd_camera"},
+        ],
+    )
 
     get_pointcloud_service = Node(
         package="compare_flexbe_utilities",
@@ -333,6 +378,19 @@ def launch_setup(context, *args, **kwargs):
         ],
     )
 
+    gz_services_bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        name='gz_bridge_services',
+        # Use CLI-style mappings as arguments (most robust across distros)
+        arguments=[
+            '/world/panda/create@ros_gz_interfaces/srv/SpawnEntity',
+            '/world/panda/remove@ros_gz_interfaces/srv/DeleteEntity',
+            '/world/panda/set_pose@ros_gz_interfaces/srv/SetEntityPose',
+        ],
+        output='screen'
+    )
+
     # start up all of the nodes
     return [
         gz_sim,
@@ -346,8 +404,9 @@ def launch_setup(context, *args, **kwargs):
         run_move_group_node,
         load_arm_controller,
         load_hand_controller,
+        move_cartesian,
         # move_named,
-        # move_pose,
+        move_pose,
         get_pointcloud_service,
         euclidean_clustering_service,
         filter_by_indices_service,
@@ -355,6 +414,8 @@ def launch_setup(context, *args, **kwargs):
         spawn_object_2,
         spawn_object_3,
         detect_grasps,
+        compute_grasp_poses,
+        gz_services_bridge,
     ]
 
 def generate_launch_description():
