@@ -252,17 +252,17 @@ def launch_setup(context, *args, **kwargs):
         ],
     )
 
-    # move_named = Node(
-    #     package="robot_common_manip",
-    #     executable="move_to_named_pose_service",
-    #     name="move_to_named_pose_service",
-    #     output="screen",
-    #     parameters=[
-    #         {"planning_group": planning_group},
-    #         robot_description,
-    #         robot_description_semantic,
-    #     ],
-    # )
+    move_named = Node(
+        package="compare_flexbe_utilities",
+        executable="move_to_named_pose_service",
+        name="move_to_named_pose_service",
+        output="screen",
+        parameters=[
+            {"planning_group": planning_group},
+            robot_description,
+            robot_description_semantic,
+        ],
+    )
 
     detect_grasps = Node(
         package="gpd_ros",
@@ -271,7 +271,7 @@ def launch_setup(context, *args, **kwargs):
         output="screen",
         parameters=[
             {"camera_position": [0.0, 0.0, 0.0]},
-            {"config_file": '/home/brian/flexbe_ws/gpd/cfg/ros_eigen_params.cfg'},
+            {"config_file": '/home/csrobot/flexbe_ws/gpd/cfg/ros_eigen_params.cfg'},
             {"rviz_topic": "grasp_markers"},  # /rviz_grasps
             {"grasps_topic": "/clustered_grasps"},
         ],
@@ -283,15 +283,15 @@ def launch_setup(context, *args, **kwargs):
         name="grasp_pose_server",
         output="screen",
         parameters=[
-            {"gripper_offset": -0.02},
-            {"approach_dist": 0.0},
+            {"gripper_offset": 0.0},
+            {"approach_dist": 0.10},
             {"retreat_dist": 0.0},
             {"grasp_rot_x": 0.0},
-            {"grasp_rot_y": 0.39269908169},
-            {"grasp_rot_z": -0.981747704},
+            {"grasp_rot_y": 0.0},
+            {"grasp_rot_z": 0.0},
             {"grasp_rot_w": 1.0},
             {"target_frame": "panda_link0"},
-            {"source_frame": "rgbd_camera/camera_link/rgbd_camera"},
+            {"source_frame": "simple_pedestal"},
         ],
     )
 
@@ -302,7 +302,7 @@ def launch_setup(context, *args, **kwargs):
         output="screen",
         parameters=[
             {"default_camera_topic": "/camera/depth/points"},
-            {"target_frame": "base_link"},
+            {"target_frame": "panda_link0"},
             {"timeout_sec": 3.0},
         ],
     )
@@ -314,7 +314,7 @@ def launch_setup(context, *args, **kwargs):
         output="screen",
         parameters=[
             {"default_camera_topic": "/camera/depth/points"},
-            {"target_frame": "base_link"},
+            {"target_frame": "panda_link0"},
             {"timeout_sec": 3.0},
         ],
     )
@@ -326,7 +326,7 @@ def launch_setup(context, *args, **kwargs):
         output="screen",
         parameters=[
             {"default_camera_topic": "/camera/depth/points"},
-            {"target_frame": "base_link"},
+            {"target_frame": "panda_link0"},
             {"timeout_sec": 3.0},
         ],
     )
@@ -371,7 +371,7 @@ def launch_setup(context, *args, **kwargs):
         output="screen",
         parameters=[
             {"camera_position": [0.0, 0.0, 0.0]},
-            {"config_file": '/home/csrobot/gpd_ws/gpd/cfg/ros_eigen_params.cfg'},
+            {"config_file": '/home/csrobot/flexbe_ws/gpd/cfg/ros_eigen_params.cfg'},
             {"grasps_topic": 'clustered_grasps'},
             # {"rviz_topic": "grasp_plotter"},
             {"service_name": 'detect_grasps'},
@@ -405,7 +405,7 @@ def launch_setup(context, *args, **kwargs):
         load_arm_controller,
         load_hand_controller,
         move_cartesian,
-        # move_named,
+        move_named,
         move_pose,
         get_pointcloud_service,
         euclidean_clustering_service,
