@@ -271,7 +271,7 @@ def launch_setup(context, *args, **kwargs):
         output="screen",
         parameters=[
             {"camera_position": [0.0, 0.0, 0.0]},
-            {"config_file": '/home/csrobot/flexbe_ws/gpd/cfg/ros_eigen_params.cfg'},
+            {"config_file": '/home/brian/flexbe_ws/gpd/cfg/ros_eigen_params.cfg'},
             {"rviz_topic": "grasp_markers"},  # /rviz_grasps
             {"grasps_topic": "/clustered_grasps"},
         ],
@@ -331,35 +331,13 @@ def launch_setup(context, *args, **kwargs):
         ],
     )
 
-    spawn_object_1 = Node(
+    spawn_object = Node(
         package='ros_gz_sim',
         executable='create',
         arguments=[
-            '-file', '/home/csrobot/gazebo_models/wood_cube_10cm/model.sdf',
+            '-file', '/home/brian/gazebo_models/wood_cube_10cm/model.sdf',
             '-name', 'object_1',
             '-x', '0.55', '-y', '0.05', '-z', '0.65', '-R', '0.0', '-P', '0.0', '-Y', '0.0',  # Adjust pose if needed
-        ],
-        output='screen'
-    )
-
-    spawn_object_2 = Node(
-        package='ros_gz_sim',
-        executable='create',
-        arguments=[
-            '-file', '/home/csrobot/gazebo_models/wood_cube_10cm/model.sdf',
-            '-name', 'object_2',
-            '-x', '0.45', '-y', '0.15', '-z', '0.65', '-R', '0.0', '-P', '0.0', '-Y', '0.0',  # Adjust pose if needed
-        ],
-        output='screen'
-    )
-
-    spawn_object_3 = Node(
-        package='ros_gz_sim',
-        executable='create',
-        arguments=[
-            '-file', '/home/csrobot/gazebo_models/wood_cube_10cm/model.sdf',
-            '-name', 'object_3',
-            '-x', '0.5', '-y', '0.10', '-z', '0.65', '-R', '0.0', '-P', '0.0', '-Y', '0.0',  # Adjust pose if needed
         ],
         output='screen'
     )
@@ -371,7 +349,7 @@ def launch_setup(context, *args, **kwargs):
         output="screen",
         parameters=[
             {"camera_position": [0.0, 0.0, 0.0]},
-            {"config_file": '/home/csrobot/flexbe_ws/gpd/cfg/ros_eigen_params.cfg'},
+            {"config_file": '/home/brian/flexbe_ws/gpd/cfg/ros_eigen_params.cfg'},
             {"grasps_topic": 'clustered_grasps'},
             # {"rviz_topic": "grasp_plotter"},
             {"service_name": 'detect_grasps'},
@@ -410,9 +388,7 @@ def launch_setup(context, *args, **kwargs):
         get_pointcloud_service,
         euclidean_clustering_service,
         filter_by_indices_service,
-        spawn_object_1,
-        spawn_object_2,
-        spawn_object_3,
+        # spawn_object,
         detect_grasps,
         compute_grasp_poses,
         gz_services_bridge,
