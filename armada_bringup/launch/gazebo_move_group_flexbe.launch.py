@@ -47,10 +47,10 @@ def launch_setup(context, *args, **kwargs):
     moveit_config_path = get_package_share_directory(moveit_config_package)
     gazebo_package_path = get_package_share_directory(gazebo_package)
     ros_gz_sim_path = get_package_share_directory('ros_gz_sim')
-    flexbe_onboard_path = get_package_share_directory('flexbe_onboard')
     flexbe_webui_path = get_package_share_directory('flexbe_webui')
 
-    gazebo_models_path = os.path.join(gazebo_package_path, 'models') 
+    home_dir = os.path.expanduser("~")
+    gpd_library_path = os.path.join(home_dir, 'flexbe_ws', 'gpd')                   # modify this command if the workspace where gpd is installed is different than flexbe_ws
 
     # Robot Description
     xacro_path = os.path.join(robot_description_pkg, f'{robot_model}', 'xacro', f'{robot_model}' + (f'_{workstation}' if workstation else '') + '.urdf.xacro')
@@ -383,11 +383,6 @@ def launch_setup(context, *args, **kwargs):
         executable="plane_segmentation_service",
         name="plane_segmentation_service",
         output="screen",
-        # parameters=[
-        #     {"default_camera_topic": "/camera/depth/points"},
-        #     {"target_frame": "panda_link0"},
-        #     {"timeout_sec": 3.0},
-        # ],
     )
 
     passthrough_filter_service = Node(
@@ -395,34 +390,40 @@ def launch_setup(context, *args, **kwargs):
         executable="passthrough_filter_service",
         name="passthrough_filter_service",
         output="screen",
-        # parameters=[
-        #     {"default_camera_topic": "/camera/depth/points"},
-        #     {"target_frame": "panda_link0"},
-        #     {"timeout_sec": 3.0},
-        # ],
     )
 
-    spawn_object = Node(
+    spawn_object0 = Node(
         package='ros_gz_sim',
         executable='create',
         arguments=[
-            '-file', '/home/brian/gazebo_models/wood_cylinder_flared_1_25cm/model.sdf',
-            '-name', 'object_1',
-            '-x', '0.55', '-y', '0.075', '-z', '0.675', '-R', '0.0', '-P', '0.0', '-Y', '0.0',  # Adjust pose if needed
+            '-file', f'{robot_description_pkg}/simple_objects/wood_cylinder_flared_1_25cm/model.sdf',
+            '-name', 'object_0',
+            '-x', '0.55', '-y', '0.075', '-z', '0.675', '-R', '0.0', '-P', '0.0', '-Y', '0.0',
         ],
         output='screen'
     )
 
-    # spawn_object = Node(
-    #     package='ros_gz_sim',
-    #     executable='create',
-    #     arguments=[
-    #         '-file', '/home/brian/gazebo_models/wood_cube_5cm/model.sdf',
-    #         '-name', 'object_1',
-    #         '-x', '0.55', '-y', '0.075', '-z', '0.675', '-R', '0.0', '-P', '0.0', '-Y', '0.0',  # Adjust pose if needed
-    #     ],
-    #     output='screen'
-    # )
+    spawn_object1 = Node(
+        package='ros_gz_sim',
+        executable='create',
+        arguments=[
+            '-file', f'{robot_description_pkg}/simple_objects/wood_cylinder_flared_1_25cm/model.sdf',
+            '-name', 'object_1',
+            '-x', '0.75', '-y', '-0.18', '-z', '0.675', '-R', '0.0', '-P', '0.0', '-Y', '0.0', 
+        ],
+        output='screen'
+    )
+
+    spawn_object2 = Node(
+        package='ros_gz_sim',
+        executable='create',
+        arguments=[
+            '-file', f'{robot_description_pkg}/simple_objects/wood_cylinder_flared_1_25cm/model.sdf',
+            '-name', 'object_2',
+            '-x', '0.65', '-y', '0.225', '-z', '0.675', '-R', '0.0', '-P', '0.0', '-Y', '0.0',
+        ],
+        output='screen'
+    )
 
     detect_grasps = Node(
         package="gpd_ros",
@@ -431,7 +432,7 @@ def launch_setup(context, *args, **kwargs):
         # output="screen",
         parameters=[
             {"camera_position": [0.0, 0.0, 0.0]},
-            {"config_file": '/home/brian/flexbe_ws/gpd/cfg/ros_eigen_params.cfg'},
+            {"config_file": f'{gpd_library_path}/cfg/ros_eigen_params.cfg'},
             {"grasps_topic": 'clustered_grasps'},
             # {"rviz_topic": "grasp_plotter"},
             {"service_name": 'detect_grasps'},
@@ -475,7 +476,9 @@ def launch_setup(context, *args, **kwargs):
         euclidean_clustering_service,
         filter_by_indices_service,
         passthrough_filter_service,
-        spawn_object,
+        spawn_object0,
+        spawn_object1,
+        spawn_object2,
         detect_grasps,
         compute_grasp_poses,
         gz_services_bridge,
