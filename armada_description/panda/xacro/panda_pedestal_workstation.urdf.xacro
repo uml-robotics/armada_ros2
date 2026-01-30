@@ -12,7 +12,6 @@
 
   <!-- include control files -->
   <xacro:include filename="$(find armada_description)/panda/xacro/macro.ros2_control.xacro" />
-  <xacro:include filename="$(find armada_description)/panda/xacro/macro.transmission.xacro" />
 
   <!-- include dexcription files -->
   <xacro:include filename="$(find armada_description)/panda/xacro/macro.panda.urdf.xacro" />
@@ -23,7 +22,6 @@
   <xacro:panda_gazebo_sensor ns="$(arg ns)" prefix="$(arg prefix)" />
 
   <!-- panda control components-->
-  <xacro:panda_transmission prefix="$(arg prefix)" hw_iface="$(arg trans_hw_iface)" />
   <xacro:panda_ros2_control ns="$(arg ns)" prefix="$(arg prefix)" />
 
   <!-- pedestal -->
