@@ -14,7 +14,7 @@ find_package(ament_cmake REQUIRED)
 install(DIRECTORY panda/ DESTINATION share/${PROJECT_NAME}/panda)
 install(DIRECTORY tm5-700/ DESTINATION share/${PROJECT_NAME}/tm5-700)
 install(DIRECTORY workstation/ DESTINATION share/${PROJECT_NAME}/workstation)
-install(DIRECTORY simple_objects/ DESTINATION share/${PROJECT_NAME}/simple_objects)
+install(DIRECTORY models DESTINATION share/${PROJECT_NAME}/models)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

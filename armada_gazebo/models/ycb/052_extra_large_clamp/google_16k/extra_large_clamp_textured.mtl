@@ -1,0 +1,4 @@
+newmtl material_0
+# shader_type beckmann
+map_Kd extra_large_clamp_texture_map.png 
+

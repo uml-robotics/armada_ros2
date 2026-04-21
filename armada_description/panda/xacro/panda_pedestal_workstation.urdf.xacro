@@ -12,6 +12,10 @@
 
   <!-- include control files -->
   <xacro:include filename="$(find armada_description)/panda/xacro/macro.ros2_control.xacro" />
+<<<<<<< HEAD
+=======
+  <xacro:include filename="$(find armada_description)/panda/xacro/macro.transmission.xacro" />
+>>>>>>> e05cfaa (add modules/nodes for cgn, uoc, gsam, and camera poses; split gazebo_move_group.launch.py into mutiple modular launch files under /split_launches)
 
   <!-- include dexcription files -->
   <xacro:include filename="$(find armada_description)/panda/xacro/macro.panda.urdf.xacro" />
@@ -22,6 +26,10 @@
   <xacro:panda_gazebo_sensor ns="$(arg ns)" prefix="$(arg prefix)" />
 
   <!-- panda control components-->
+<<<<<<< HEAD
+=======
+  <xacro:panda_transmission prefix="$(arg prefix)" hw_iface="$(arg trans_hw_iface)" />
+>>>>>>> e05cfaa (add modules/nodes for cgn, uoc, gsam, and camera poses; split gazebo_move_group.launch.py into mutiple modular launch files under /split_launches)
   <xacro:panda_ros2_control ns="$(arg ns)" prefix="$(arg prefix)" />
 
   <!-- pedestal -->

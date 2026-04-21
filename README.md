@@ -29,6 +29,15 @@ You can see all available launch arguments by adding the `--show-args` flag:
 ros2 launch armada_bringup gazebo_move_group.launch.py --show-args
 ```
 
+----
+
+Bringup command with flexbe:
+```bash
+ros2 launch armada_bringup gazebo_move_group.launch.py workstation:=pedestal_workstation headless:=True launch_flexbe:=True
+```
+
+---
+
 ### Available Options
 
 - **No arguments**  
