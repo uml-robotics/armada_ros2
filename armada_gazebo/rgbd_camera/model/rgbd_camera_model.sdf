@@ -30,13 +30,6 @@
           </box>
         </geometry>
       </visual>
-<<<<<<< HEAD
-      <sensor name="rgbd_camera" type="depth_camera">
-        <pose>0 0 0 0 0 0</pose>
-        <always_on>1</always_on>
-        <update_rate>30</update_rate>
-        <visualize>true</visualize>`
-=======
       <sensor name="rgbd_camera" type="rgbd_camera">
         <pose>0 0 0 0 0 0</pose>
         <always_on>1</always_on>
@@ -44,7 +37,6 @@
         <visualize>true</visualize>
         
          <!-- RGB sub-camera -->
->>>>>>> e05cfaa (add modules/nodes for cgn, uoc, gsam, and camera poses; split gazebo_move_group.launch.py into mutiple modular launch files under /split_launches)
         <camera>
           <horizontal_fov>1.047</horizontal_fov>
           <image>
@@ -53,14 +45,6 @@
             <format>R8G8B8</format>
           </image>
           <clip>
-<<<<<<< HEAD
-            <near>0.05</near>
-            <far>5.0</far>
-          </clip>
-        </camera>
-        <plugin name="gz::sim::systems::Sensors" filename="gz-sim-sensors-system"/>
-      </sensor>
-=======
             <near>0.6</near>
             <far>1.5</far>  <!-- match your current depth clip_far if you like -->
           </clip>
@@ -86,7 +70,6 @@
         <plugin name="gz::sim::systems::Sensors" filename="gz-sim-sensors-system"/>
       </sensor>
 
->>>>>>> e05cfaa (add modules/nodes for cgn, uoc, gsam, and camera poses; split gazebo_move_group.launch.py into mutiple modular launch files under /split_launches)
     </link>
 
     <plugin
