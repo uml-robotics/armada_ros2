@@ -1,0 +1,50 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="bleach_cleanser">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>0 0 0 -3.0710620577865737 0.00011268369926741806 1.560369287349376</pose> 
+        <!-- <pose>-0.017138949272641094 0.011574369859748879 0.09969796254743375 -3.0710620577865737 0.00011268369926741806 1.560369287349376</pose>  -->
+        <mass>0.0009723430520036826</mass>
+        <inertia>
+          <ixx>4.5661279829144376e-06</ixx>
+          <ixy>-5.854241538373342e-23</ixy>
+          <ixz>5.24290336690837e-22</ixz>
+          <iyy>4.251487136560936e-06</iyy>
+          <iyz>1.9852334701272664e-23</iyz>
+          <izz>7.652924492717368e-07</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://021_bleach_cleanser/google_16k/textured_simple.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://021_bleach_cleanser/google_16k/textured_simple.obj</uri>
+	        </mesh>
+        </geometry>
+        <!-- <material>
+          <script>
+            <uri>model://021_bleach_cleanser/bleach_cleanser.material</uri>
+            <name>bleach_cleanser</name>
+          </script>
+        </material> -->
+      </visual>
+    </link>
+  </model>
+</sdf>
